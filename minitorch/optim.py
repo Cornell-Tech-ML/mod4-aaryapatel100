@@ -15,6 +15,14 @@ class SGD(Optimizer):
         self.lr = lr
 
     def zero_grad(self) -> None:
+        """Resets the gradients of all model parameters to zero.
+
+        This function iterates over all parameters stored within the optimizer.
+        For each parameter, if it has an associated derivative or gradient,
+        these are set to None, effectively resetting them to zero. This is a
+        necessary step before performing a new optimization step, ensuring that
+        gradients do not accumulate from previous updates.
+        """
         for p in self.parameters:
             if p.value is None:
                 continue
@@ -26,6 +34,21 @@ class SGD(Optimizer):
                     p.value.grad = None
 
     def step(self) -> None:
+        """Performs a single optimization step.
+
+        For each parameter, this function updates the parameter by moving in the
+        direction of the negative gradient. The learning rate is the magnitude of
+        the update.
+
+        Args:
+        ----
+            None
+
+        Returns:
+        -------
+            None
+
+        """
         for p in self.parameters:
             if p.value is None:
                 continue
