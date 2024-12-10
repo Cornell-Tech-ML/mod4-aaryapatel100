@@ -1,14 +1,11 @@
 from typing import Tuple, TypeVar, Any
 
-import numpy as np
 from numba import prange
 from numba import njit as _njit
 
 from .autodiff import Context
 from .tensor import Tensor
 from .tensor_data import (
-    MAX_DIMS,
-    Index,
     Shape,
     Strides,
     Storage,
@@ -180,7 +177,7 @@ class Conv1dFun(Function):
         Returns:
         -------
             Tuple[Tensor, Tensor]: A tuple where the first element is the gradient with respect to the input tensor `t1`, and the second element is the gradient with respect to the weight tensor `t2`.
-        
+
         """
         input, weight = ctx.saved_values
         batch, in_channels, w = input.shape

@@ -1,8 +1,6 @@
 from typing import Tuple, Optional
 
-from . import operators
 from .autodiff import Context
-from .fast_ops import FastOps
 from .tensor import Tensor
 from .tensor_functions import Function, rand, tensor, zeros
 
@@ -54,6 +52,7 @@ def tile(input: Tensor, kernel: Tuple[int, int]) -> Tuple[Tensor, int, int]:
 
     return output, new_height, new_width
 
+
 def avgpool2d(input: Tensor, kernel: Tuple[int, int]) -> Tensor:
     """Apply average pooling 2D
 
@@ -71,6 +70,7 @@ def avgpool2d(input: Tensor, kernel: Tuple[int, int]) -> Tensor:
     # Calculate mean and reshape to remove the last dimension
     pooled = output.mean(4)
     return pooled.view(pooled.shape[0], pooled.shape[1], new_height, new_width)
+
 
 def argmax(input: Tensor, dim: Optional[int] = None) -> Tensor:
     """Compute the argmax as a 1-hot tensor.
@@ -90,6 +90,7 @@ def argmax(input: Tensor, dim: Optional[int] = None) -> Tensor:
     else:
         max_vals = input.f.max_reduce(input, int(input._ensure_tensor(dim).item()))
     return max_vals == input
+
 
 class Max(Function):
     @staticmethod
@@ -129,6 +130,7 @@ class Max(Function):
         one_hot = argmax(input, int(dim.item()))
         return grad_output * one_hot, tensor([0.0])
 
+
 def max(input: Tensor, dim: Optional[int] = None) -> Tensor:
     """Compute the max over the dimension 'dim' of the input tensor.
 
@@ -149,6 +151,7 @@ def max(input: Tensor, dim: Optional[int] = None) -> Tensor:
     else:
         return Max.apply(input, input._ensure_tensor(dim))
 
+
 def softmax(input: Tensor, dim: int) -> Tensor:
     """Computes the softmax of the input tensor over the given dimension.
 
@@ -164,7 +167,8 @@ def softmax(input: Tensor, dim: int) -> Tensor:
     """
     e = (input - max(input, dim)).exp()
     return e / e.sum(dim)
-    
+
+
 def logsoftmax(input: Tensor, dim: int) -> Tensor:
     """Computes the log of the softmax of the input tensor over the given dimension.
 
@@ -181,7 +185,8 @@ def logsoftmax(input: Tensor, dim: int) -> Tensor:
     max_val = max(input, dim)
     # input values - LSE using max
     return input - ((input - max_val).exp()).sum(dim).log() - max_val
-    
+
+
 def maxpool2d(input: Tensor, kernel: Tuple[int, int]) -> Tensor:
     """Apply max pooling 2D.
 
@@ -193,13 +198,14 @@ def maxpool2d(input: Tensor, kernel: Tuple[int, int]) -> Tensor:
     Returns:
     -------
         A tensor with shape batch x channel x new_height x new_width after applying max pooling.
-        
+
     """
     output, new_height, new_width = tile(input, kernel)
     # Calculate mean and reshape to remove the last dimension
     pooled = max(output, 4)
     return pooled.view(pooled.shape[0], pooled.shape[1], new_height, new_width)
-    
+
+
 def dropout(input: Tensor, rate: float, ignore: bool = False) -> Tensor:
     """Randomly sets elements to zero with probability rate.
 
@@ -218,4 +224,4 @@ def dropout(input: Tensor, rate: float, ignore: bool = False) -> Tensor:
         return input
     elif rate == 1.0:
         return zeros(input.shape)
-    return input * (rand(input.shape)>rate)
+    return input * (rand(input.shape) > rate)

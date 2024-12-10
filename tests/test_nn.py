@@ -33,7 +33,7 @@ def test_avg(t: Tensor) -> None:
 def test_max(t: Tensor) -> None:
     out = minitorch.max(t, 2)  # Max along width
     assert out.shape == (2, 3, 1)
-    
+
     # forward pass
     for i in range(t.shape[0]):
         for j in range(t.shape[1]):
@@ -44,9 +44,8 @@ def test_max(t: Tensor) -> None:
 
     # Backward Pass Check using Grad Check
     # Make sure there's no zero values for checking against those produce by argmax
-    t += 0.1*minitorch.rand(t.shape) # Add really small random noise
+    t += 0.1 * minitorch.rand(t.shape)  # Add really small random noise
     minitorch.grad_check(lambda t: minitorch.max(t, 2), t)
-    
 
 
 @pytest.mark.task4_4

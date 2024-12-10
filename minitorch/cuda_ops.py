@@ -6,7 +6,6 @@ from typing import Callable, Optional, TypeVar, Any
 import numba
 from numba import cuda
 from numba.cuda import jit as _jit
-from numpy._core.defchararray import index
 from .tensor import Tensor
 from .tensor_data import (
     MAX_DIMS,
@@ -367,7 +366,7 @@ def _sum_practice(out: Storage, a: Storage, size: int) -> None:
                 cuda.syncthreads()
         if pos == 0:
             out[cuda.blockIdx.x] = cache[0]
-            
+
     # step = 1
     # while step < BLOCK_DIM:
     #     if pos % (2 * step) == 0 and pos + step < BLOCK_DIM:
@@ -436,11 +435,11 @@ def tensor_reduce(
         out_index = cuda.local.array(MAX_DIMS, numba.int32)
         out_pos = cuda.blockIdx.x
         pos = cuda.threadIdx.x
-        
+
         if out_pos < out_size:
             to_index(out_pos, out_shape, out_index)
             o = index_to_position(out_index, out_strides)
-            
+
             out_index[reduce_dim] = out_index[reduce_dim] * BLOCK_DIM + pos
             if out_index[reduce_dim] < a_shape[reduce_dim]:
                 a_pos = index_to_position(out_index, a_strides)
@@ -455,7 +454,7 @@ def tensor_reduce(
                     x += 1
             if pos == 0:
                 out[o] = cache[0]
-    
+
         # i = cuda.blockIdx.x * cuda.blockDim.x + cuda.threadIdx.x
         # # Only proceed if thread is within output size
         # if i < out_size:
@@ -626,27 +625,23 @@ def _tensor_matrix_multiply(
         k = k_start + pj
         if i < a_shape[1] and k < a_shape[2]:
             a_shared[pi, pj] = a_storage[
-                batch * a_batch_stride
-                + i * a_strides[1]
-                + k * a_strides[2]
+                batch * a_batch_stride + i * a_strides[1] + k * a_strides[2]
             ]
         k = k_start + pi
         if j < b_shape[2] and k < b_shape[1]:
             b_shared[pi, pj] = b_storage[
-                batch * b_batch_stride
-                + k * b_strides[1]
-                + j * b_strides[2]
+                batch * b_batch_stride + k * b_strides[1] + j * b_strides[2]
             ]
         cuda.syncthreads()
-        
+
         for k in range(BLOCK_DIM):
             if (k_start + k) < a_shape[2]:
                 value += a_shared[pi, k] * b_shared[k, pj]
-        
+
     if i < out_shape[1] and j < out_shape[2]:
         pos = batch * out_strides[0] + i * out_strides[1] + j * out_strides[2]
         out[pos] = value
-    
+
     # MY LOGIC
     # # For loop through # of blocks horizontally in tensor A (a_shape[-1] // BLOCK_DIM)
     # # + 1 is because range is exclusive
