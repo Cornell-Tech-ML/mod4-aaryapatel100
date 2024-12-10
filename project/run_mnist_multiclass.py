@@ -77,13 +77,13 @@ class Network(minitorch.Module):
         self.mid = self.conv1.forward(x).relu()
         self.out = self.conv2.forward(self.mid).relu()
         out = minitorch.maxpool2d(self.out, (4, 4))
-        
+
         # Flatten channels, height, and width (dimensions 1, 2, and 3)
         out = out.view(out.shape[0], out.shape[1] * out.shape[2] * out.shape[3])
-        
+
         # Apply a Linear to size 64 followed by a ReLU and Dropout with rate 25%
         out = minitorch.dropout(self.linear1.forward(out).relu(), 0.25, ignore=not self.training)
-        
+
         # Logsoftmax over class dimension
         out = minitorch.logsoftmax(self.linear2.forward(out), 1)
         return out
@@ -100,8 +100,8 @@ def make_mnist(start, stop):
     return X, ys
 
 
-def default_log_fn(epoch, total_loss, correct, total, losses, model):
-    print(f"Epoch {epoch} loss {total_loss} valid acc {correct}/{total}")
+def default_log_fn(epoch, total_loss, train_correct, correct, total, losses, model):
+    print(f"Epoch {epoch} loss {total_loss} train acc {train_correct}/{total} valid acc {correct}/{total}")
 
 
 class ImageTrain:
@@ -143,6 +143,17 @@ class ImageTrain:
                 prob = (out * y).sum(1)
                 loss = -(prob / y.shape[0]).sum()
 
+                tr_correct = 0
+                for i in range(BATCH):
+                    m = -1000
+                    ind = -1
+                    for j in range(C):
+                        if out[i, j] > m:
+                            ind = j
+                            m = out[i, j]
+                    if y[i, ind] == 1.0:
+                        tr_correct += 1
+
                 assert loss.backend == BACKEND
                 loss.view(1).backward()
 
@@ -176,7 +187,7 @@ class ImageTrain:
                                     m = out[i, j]
                             if y[i, ind] == 1.0:
                                 correct += 1
-                    log_fn(epoch, total_loss, correct, BATCH, losses, model)
+                    log_fn(epoch, total_loss, tr_correct, correct, BATCH, losses, model)
 
                     total_loss = 0.0
                     model.train()
