@@ -41,8 +41,7 @@ class Conv2d(minitorch.Module):
         self.bias = RParam(out_channels, 1, 1)
 
     def forward(self, input):
-        # TODO: Implement for Task 4.5.
-        raise NotImplementedError("Need to implement for Task 4.5")
+        return minitorch.conv2d(input, self.weights.value) + self.bias.value
 
 
 class Network(minitorch.Module):
@@ -67,13 +66,27 @@ class Network(minitorch.Module):
         self.mid = None
         self.out = None
 
-        # TODO: Implement for Task 4.5.
-        raise NotImplementedError("Need to implement for Task 4.5")
+        self.conv1 = Conv2d(1, 4, 3, 3)
+        self.conv2 = Conv2d(4, 8, 3, 3)
+        # maxpooling doesn't need a layer to be added in (look at below)
+        self.linear1 = Linear(392, 64)
+        self.linear2 = Linear(64, C)
 
     def forward(self, x):
-        # TODO: Implement for Task 4.5.
-        raise NotImplementedError("Need to implement for Task 4.5")
-
+        # Instructions found above
+        self.mid = self.conv1.forward(x).relu()
+        self.out = self.conv2.forward(self.mid).relu()
+        out = minitorch.maxpool2d(self.out, (4, 4))
+        
+        # Flatten channels, height, and width (dimensions 1, 2, and 3)
+        out = out.view(out.shape[0], out.shape[1] * out.shape[2] * out.shape[3])
+        
+        # Apply a Linear to size 64 followed by a ReLU and Dropout with rate 25%
+        out = minitorch.dropout(self.linear1.forward(out).relu(), 0.25, ignore=not self.training)
+        
+        # Logsoftmax over class dimension
+        out = minitorch.logsoftmax(self.linear2.forward(out), 1)
+        return out
 
 def make_mnist(start, stop):
     ys = []
