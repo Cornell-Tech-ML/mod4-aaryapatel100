@@ -122,6 +122,8 @@ Best Valid accuracy: 73.00%
 <details>
   <summary>MNIST Dataset</summary>
   <a href="mnist.txt">mnist.txt</a>
+  Note: There's a gap inserted at line 992 which represents point of early stopping (validation accuracy before this point reaches 16/16 with slight fluctuation). Rest of log is for showing what happens while training to 25th epoch.
+
   <pre>
 Epoch 1 loss 2.29952748717025 train acc 4/16 valid acc 2/16
 Epoch 1 loss 11.565684490737647 train acc 3/16 valid acc 2/16
@@ -1114,6 +1116,8 @@ Epoch 16 loss 1.3387111368450257 train acc 14/16 valid acc 15/16
 Epoch 16 loss 0.7796869754313829 train acc 16/16 valid acc 16/16
 Epoch 16 loss 0.941475916535162 train acc 15/16 valid acc 16/16
 Epoch 16 loss 0.48291303702426913 train acc 15/16 valid acc 16/16
+
+
 Epoch 16 loss 0.8162138576562094 train acc 15/16 valid acc 15/16
 Epoch 16 loss 1.1403516399371814 train acc 16/16 valid acc 15/16
 Epoch 16 loss 0.5484352328811606 train acc 16/16 valid acc 15/16

@@ -989,6 +989,8 @@ Epoch 16 loss 1.3387111368450257 train acc 14/16 valid acc 15/16
 Epoch 16 loss 0.7796869754313829 train acc 16/16 valid acc 16/16
 Epoch 16 loss 0.941475916535162 train acc 15/16 valid acc 16/16
 Epoch 16 loss 0.48291303702426913 train acc 15/16 valid acc 16/16
+
+
 Epoch 16 loss 0.8162138576562094 train acc 15/16 valid acc 15/16
 Epoch 16 loss 1.1403516399371814 train acc 16/16 valid acc 15/16
 Epoch 16 loss 0.5484352328811606 train acc 16/16 valid acc 15/16
